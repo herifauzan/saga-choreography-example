@@ -10,3 +10,19 @@ Your setup models an Order Processing Saga — when you create an order, four mi
 | **shipping-service**      | `PaymentCompleted`                   | `ShippingScheduled` + `OrderCompleted`   | Ships order           |
 | *(optional compensation)* | `InventoryFailed` or `PaymentFailed` | `OrderCancelled`                         | Marks order as failed |
 
+
+# Sequence Diagram
++-------------+       +----------------+       +----------------+       +----------------+
+| Order Svc   |       | Inventory Svc  |       | Payment Svc    |       | Shipping Svc   |
++-------------+       +----------------+       +----------------+       +----------------+
+       |                       |                       |                       |
+       | OrderCreated -------->|                       |                       |
+       |                       | check stock           |                       |
+       |                       | InventoryReserved ---->|                       |
+       |                       |                       | process payment        |
+       |                       |                       | PaymentCompleted ----->|
+       |                       |                       |                       | schedule shipping
+       |                       |                       |                       | ShippingScheduled
+       |                       |                       |                       | OrderCompleted ---+
+       |<----------------------+<----------------------+<----------------------+                   |
+       | update status = COMPLETED                                                           (success)
