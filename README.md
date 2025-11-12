@@ -12,17 +12,24 @@ Your setup models an Order Processing Saga — when you create an order, four mi
 
 
 # Sequence Diagram
-+-------------+       +----------------+       +----------------+       +----------------+
-| Order Svc   |       | Inventory Svc  |       | Payment Svc    |       | Shipping Svc   |
-+-------------+       +----------------+       +----------------+       +----------------+
-       |                       |                       |                       |
-       | OrderCreated -------->|                       |                       |
-       |                       | check stock           |                       |
-       |                       | InventoryReserved ---->|                       |
-       |                       |                       | process payment        |
-       |                       |                       | PaymentCompleted ----->|
-       |                       |                       |                       | schedule shipping
-       |                       |                       |                       | ShippingScheduled
-       |                       |                       |                       | OrderCompleted ---+
-       |<----------------------+<----------------------+<----------------------+                   |
-       | update status = COMPLETED                                                           (success)
+## 🧩 Saga Choreography — Event Sequence (Success Flow)
+
+This diagram shows how the **Order**, **Inventory**, **Payment**, and **Shipping** services
+coordinate using **Kafka topics** in a Saga **Choreography pattern** — without a central orchestrator.
+
+Each service listens for specific events and publishes its own events to continue the workflow.
+
++-------------+ +----------------+ +----------------+ +----------------+
+| Order Svc | | Inventory Svc | | Payment Svc | | Shipping Svc |
++-------------+ +----------------+ +----------------+ +----------------+
+| | | |
+| OrderCreated -------->| | |
+| | check stock | |
+| | InventoryReserved ---->| |
+| | | process payment |
+| | | PaymentCompleted ----->|
+| | | | schedule shipping
+| | | | ShippingScheduled
+| | | | OrderCompleted ---+
+|<----------------------+<----------------------+<----------------------+ |
+| update status = COMPLETED (success)
